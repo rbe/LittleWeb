@@ -1,6 +1,18 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    asciidoctor (2.0.18)
+    asciidoctor-diagram (2.2.3)
+      asciidoctor (>= 1.5.7, < 3.x)
+      asciidoctor-diagram-ditaamini (~> 1.0)
+      asciidoctor-diagram-plantuml (~> 1.2021)
+      rexml
+    asciidoctor-diagram-ditaamini (1.0.3)
+    asciidoctor-diagram-plantuml (1.2022.14)
+    asciidoctor-kroki (0.7.0)
+      asciidoctor (~> 2.0)
+    asciidoctor-plantuml (0.1.1)
+      asciidoctor (>= 2.0.17, < 3.0.0)
     ast (2.4.2)
     date (3.3.3)
     json (2.6.3)
@@ -46,6 +58,10 @@ PLATFORMS
   x86_64-darwin-22
 
 DEPENDENCIES
+  asciidoctor
+  asciidoctor-diagram
+  asciidoctor-kroki
+  asciidoctor-plantuml
   mail
   rubocop
   webrick

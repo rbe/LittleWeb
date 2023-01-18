@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: "no"
+    networks:
+      - backend
+    ports:
+      - "8025:8025"
+  kroki:
+    image: yuzutech/kroki:latest
+    restart: "no"
+    networks:
+      - backend
+    #ports:
+    #  - "8000:8000"
+  plantuml:
+    image: plantuml/plantuml-server:jetty
+    restart: "no"
+    networks:
+      - backend
+    #ports:
+    #  - "8001:8080"
+  nginx-fcgiwrap:
+    build:
+      context: docker
+    image: nginx-fcgiwrap:latest
+    restart: "no"
+    environment:
+      - TZ=Europe/Berlin
+    volumes:
+      - ./cgi-bin:/cgi-bin:ro #,exec
+      - ../:/data:rw
+      - ../asciiblog/content/assets:/assets:ro
+    networks:
+      - backend
+    ports:
+      - "8080:80"
+
+networks:
+  backend:

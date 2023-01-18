@@ -1,14 +1,12 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# HTTP
 module HTTP
   # Web server
   class WebServer
     require 'webrick'
 
     def initialize
-      # Thread.new do
       create_server
       shutdown_hook
       start
