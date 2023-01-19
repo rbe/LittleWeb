@@ -15,13 +15,13 @@ services:
       - backend
     #ports:
     #  - "8000:8000"
-  plantuml:
-    image: plantuml/plantuml-server:jetty
-    restart: "no"
-    networks:
-      - backend
-    #ports:
-    #  - "8001:8080"
+  #plantuml:
+  #  image: plantuml/plantuml-server:jetty
+  #  restart: "no"
+  #  networks:
+  #    - backend
+  #  #ports:
+  #  #  - "8001:8080"
   nginx-fcgiwrap:
     build:
       context: docker
