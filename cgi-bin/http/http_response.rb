@@ -62,7 +62,7 @@ module HTTP
 
     # Send HTTP 403 Forbidden
     # @param [String] message
-    def forbidden_reponse(message = '')
+    def forbidden_response(message = '')
       headers = STD_HEADERS.merge('status' => 403)
       @cgi.out(headers) { message.to_s }
     end
