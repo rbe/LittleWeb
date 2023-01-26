@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title Gallimaufry Access Grant
+  body
+    h1 Gallimaufry Access Grant
+    table
+      tr
+        td colspan=2 #{url}
+      tr
+        td Your Link
+        td
+          a href='#{link}' Click here
+      tr
+        td Access expires at
+        td #{token.expires}
+      tr
+        td ATTENTION
+        td Please do not forward this mail to other people.

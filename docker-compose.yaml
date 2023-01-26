@@ -13,8 +13,6 @@ services:
     restart: "no"
     networks:
       - backend
-    #ports:
-    #  - "8000:8000"
   #plantuml:
   #  image: plantuml/plantuml-server:jetty
   #  restart: "no"
@@ -22,21 +20,33 @@ services:
   #    - backend
   #  #ports:
   #  #  - "8001:8080"
-  nginx-fcgiwrap:
+  ruby-fcgiwrap:
     build:
-      context: docker
-    image: nginx-fcgiwrap:latest
+      context: docker/ruby-fcgiwrap
+    image: ruby-fcgiwrap:latest
     restart: "no"
     environment:
       - TZ=Europe/Berlin
     volumes:
-      - ./cgi-bin:/cgi-bin:ro #,exec
+      - ./src:/home/rbe/cgi-bin:rw #,exec
       - ../:/data:rw
+    networks:
+      - backend
+  ruby-nginx:
+    build:
+      context: docker/ruby-nginx
+    image: ruby-nginx:latest
+    depends_on:
+      - ruby-fcgiwrap
+    restart: "no"
+    environment:
+      - TZ=Europe/Berlin
+    volumes:
       - ../asciiblog/content/assets:/assets:ro
     networks:
       - backend
     ports:
-      - "8080:80"
+      - "8080:8080"
 
 networks:
   backend:

@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    title Gallimaufry OTP Registration
+    link rel="icon" type="image/x-icon" href="/assets/favicon.ico"
+    link rel="stylesheet" type="text/css" href="/assets/css/gallimaufry.css"
+  body
+    h1 Gallimaufry OTP Registration
+    table
+      tr
+        td colspan=2
+          h2 Success
+      tr
+        td.a
+          label for="user" User ID
+        td id="user" #{user}
+      tr
+        td OTP Registration
+        td Your registration was successful.
+      tr
+        td
+        td #{{message}}

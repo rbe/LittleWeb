@@ -1,0 +1,27 @@
+doctype html
+html
+  head
+    title Gallimaufry OTP Registration
+    link rel="icon" type="image/x-icon" href="/assets/favicon.ico"
+    link rel="stylesheet" type="text/css" href="/assets/css/gallimaufry.css"
+  body
+    h1 Gallimaufry OTP Registration
+    form action="sx_otp_registration" method="post" enctype="text/json" autocomplete="off"
+      input type="hidden" name="__csrf_token" value="#{__csrf_token}"
+      table
+        tr
+          td colspan=2
+            h2 Form
+        tr
+          td.a
+            label for="user" User ID
+          td
+            input class="visually-hidden" type="text" id="honeypot" name="honeypot" tabindex="-1"
+            input type="text" name="user" id="user" value="" size="50" placeholder="User ID"
+        tr
+          td
+          td
+            input type="submit" value="Register me for OTP authentication"
+        tr
+          td
+          td #{{message}}
