@@ -1,0 +1,34 @@
+@startuml
+
+autonumber
+hide footbox
+
+box Client
+actor "User" as User
+participant "Browser" as Browser
+end box
+box Request Processing
+participant "Dispatcher" as Dispatcher
+participant "AuthenticatingFilter" as AuthFilter
+end box
+box Action
+participant "ProxyController" as ProxyController
+end box
+
+User -> Browser ++ : Opens page /resource
+Browser -> Dispatcher ++ : HTTP GET /resource\nwith token
+Dispatcher -> AuthFilter ++ : .process()
+alt
+    AuthFilter -> AuthFilter : Token received?
+end alt
+alt
+    AuthFilter -> AuthFilter : Verify cookie:\nsx_token/sx_hash
+end alt
+AuthFilter -> ProxyController ++ : .process()
+ProxyController -> ProxyController : Process request
+AuthFilter <-- ProxyController -- : Result
+Dispatcher <-- AuthFilter -- : Result
+Browser <-- Dispatcher -- : Resource
+User <-- Browser -- : Resource
+
+@enduml
