@@ -44,14 +44,14 @@ module HTTP
     end
 
     def cleanup
-      Thread.new { Database::SimpleDb.execute 'DELETE FROM csrf_token WHERE valid_until < CURRENT_TIMESTAMP' }
+      Database::SimpleDb.execute "DELETE FROM csrf_token WHERE valid_until < datetime('now', 'localtime', '+10 minutes')"
     end
 
     def init_db
       Database::SimpleDb.create_table <<-SQL
         CREATE TABLE IF NOT EXISTS csrf_token (
-          csrf CHAR(44) UNIQUE,
-          valid_until DATETIME DEFAULT (datetime('now', 'localtime', '+10 minutes'))
+          csrf CHAR(44) UNIQUE
+          , valid_until DATETIME DEFAULT (datetime('now', 'localtime', '+10 minutes'))
         )
       SQL
     end

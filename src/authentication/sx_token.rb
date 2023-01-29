@@ -1,15 +1,14 @@
 # frozen_string_literal: true
 
 # sx: Secure Access
-module SecureAccess
-  require 'base64'
-  require_relative '../http/http_response'
-  require_relative 'constants'
-  require_relative 'hash_generator'
-
+module Authentication
   # I am a token
   # user,url,expires -> base64
-  class Token
+  class SxToken
+    require 'base64'
+    require_relative '../crypto/hash_generator'
+    require_relative 'constants'
+
     attr_reader :user, :url, :expires, :hash
 
     # Standard cookie values
@@ -18,7 +17,8 @@ module SecureAccess
       'path' => '/',
       'expires' => Time.now + Constants::EXPIRE_IN_SECONDS,
       'secure' => ENV['REQUEST_SCHEME'] == 'https',
-      'httponly' => true
+      'httponly' => true,
+      'samesite' => 'strict'
     }.freeze
 
     # @param [String] user
@@ -52,7 +52,7 @@ module SecureAccess
     end
 
     def to_hash
-      @hash = SecureAccess::HashGenerator.new.make_md5 "#{user}#{url}#{expires.to_i}"
+      @hash = Crypto::HashGenerator.new.make_md5 "#{user}#{url}#{expires.to_i}"
     end
 
     def to_base64(str)
@@ -114,7 +114,7 @@ module SecureAccess
       @hash = nil
     end
 
-    # @param [String] lines
+    # @param [Array<String>] lines
     # @param [String] url
     # @param [String] user
     def partly_match(lines, url, user)
@@ -129,7 +129,7 @@ module SecureAccess
       found
     end
 
-    # @param [String] lines
+    # @param [Array<String>] lines
     # @param [String] url
     # @param [String] user
     def exact_match(lines, url, user)
@@ -142,7 +142,7 @@ module SecureAccess
         user = 'ralf@bensmann.com'
         url = '/Gallimaufry/IJOS-Stellenportal'
         expires = Time.at(1_673_972_509)
-        t = SecureAccess::Token.new.with user, url, expires
+        t = Authentication::SxToken.new.with user, url, expires
         p t.access? user, "#{url}/IJOS-Stellenportal.adoc"
         h = 'iFCPtcop0xvSF_CcDmwSyg'
         p t == h

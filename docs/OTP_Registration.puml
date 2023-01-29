@@ -1,0 +1,41 @@
+@startuml
+
+autonumber
+hide footbox
+
+participant "User" as User
+participant "Browser" as Browser
+participant "OtpRegistration\nController" as OtpRegistrationController
+database "Database" as Database
+
+User -> Browser ++ : Open OTP registration page
+Browser -> OtpRegistrationController ++ : HTTP GET /otp/registration
+Browser <-- OtpRegistrationController -- : Result
+Browser -> OtpRegistrationController ++ : User ID
+OtpRegistrationController -> Database ++ : Lookup user:\nhas user access to anything?
+OtpRegistrationController <-- Database -- : Result
+OtpRegistrationController -> OtpRegistrationController : Check result
+alt User has access == false
+    Browser <-- OtpRegistrationController : Error
+    User <-- Browser : Present error message
+else User has access == true
+    OtpRegistrationController -> Database ++ : Insert user, secret
+    OtpRegistrationController <-- Database -- : Result
+    Browser <-- OtpRegistrationController -- : QR Code
+    User <-- Browser -- : Present QR Code
+    User -> User : User registers OTP Authenticator
+    User -> Browser ++ : Enter OTP code
+    Browser -> OtpRegistrationController ++ : OTP Code
+    OtpRegistrationController -> OtpRegistrationController : Check OTP
+    alt OTP verification failed
+        Browser <-- OtpRegistrationController : Error
+        User <-- Browser : Present error message
+    else
+        OtpRegistrationController -> Database ++ : Activate user
+        OtpRegistrationController <-- Database -- : Result
+        Browser <-- OtpRegistrationController -- : Result
+        User <-- Browser -- : Present result
+    end
+end
+
+@enduml

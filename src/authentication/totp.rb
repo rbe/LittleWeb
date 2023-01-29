@@ -17,14 +17,14 @@ module Authentication
     # => 'otpauth://totp/OTP_ISSUER:USER?secret=base32secret3232&issuer=OTP_ISSUER'
     # @param [String] user
     def generate_qrcode(user)
-      otp_secret = lookup_otp_secret user
-      if otp_secret.empty?
-        otp_secret = ROTP::Base32.random
-        Database::SimpleDb.execute 'INSERT INTO totp (user, otp_secret)' \
-                                       " VALUES (\"#{user}\", \"#{otp_secret}\")",
+      secret = lookup_otp_secret user
+      if secret.nil?
+        secret = ROTP::Base32.random
+        Database::SimpleDb.execute 'INSERT INTO otp (user, secret)' \
+                                       " VALUES (\"#{user}\", \"#{secret}\")",
                                    single_tx: true
       end
-      totp = ROTP::TOTP.new(otp_secret, issuer: Constants::OTP_ISSUER)
+      totp = ROTP::TOTP.new(secret, issuer: Constants::OTP_ISSUER)
       uri = totp.provisioning_uri(user)
       qrcode = RQRCode::QRCode.new(uri)
       qrcode.as_svg(
@@ -37,49 +37,62 @@ module Authentication
     end
 
     # @param [String] user
-    # @param [String] otp_code
-    def verify(user, otp_code)
-      secs30 = (Time.now - 30).to_i
-      otp_secret = lookup_otp_secret user
-      return unless otp_secret
+    # @param [String] otp
+    def verify_first_time(user, otp)
+      return unless verify user, otp
 
-      totp = ROTP::TOTP.new(otp_secret, issuer: Constants::OTP_ISSUER)
-      !totp.verify(otp_code.to_s, after: secs30).nil?
+      Database::SimpleDb.execute "UPDATE validated_at = datetime('now', 'localtime') WHERE user = '#{user}'"
+      true
+    end
+
+    # @param [String] user
+    # @param [String] otp
+    def verify(user, otp)
+      secs30 = (Time.now - 30).to_i
+      secret = lookup_otp_secret user
+      return unless secret
+
+      totp = ROTP::TOTP.new(secret, issuer: Constants::OTP_ISSUER)
+      !totp.verify(otp.to_s, after: secs30).nil?
     end
 
     private
 
     def init_db
       Database::SimpleDb.create_table <<-SQL
-        CREATE TABLE IF NOT EXISTS totp (
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-          , user VARCHAR(50) NOT NULL CHECK(user <> '') UNIQUE,
-          , otp_secret CHAR(32) NOT NULL CHECK(otp_secret <> '') UNIQUE
+        CREATE TABLE IF NOT EXISTS otp (
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+          , validated_at DATETIME CHECK(validated_at > created_at)
+          , user VARCHAR(50) NOT NULL CHECK(user <> '') UNIQUE
+          , secret CHAR(32) NOT NULL CHECK(secret <> '') UNIQUE
         )
       SQL
     end
 
     # @param [String] user
-    # @return [String] otp_secret
+    # @return [String] secret
     def lookup_otp_secret(user)
-      results = Database::SimpleDb.execute "SELECT otp_secret FROM totp WHERE user = \"#{user}\""
-      return '' unless results&.length&.positive?
+      results = Database::SimpleDb.execute "SELECT secret FROM otp WHERE user = \"#{user}\""
+      return unless results&.length&.positive?
 
       row = results[0]
-      row['otp_secret'] if row
+      row['secret'] if row
     end
 
     class << self
       def test_generate_qrcode
-        rotp = TOTP.new
-        svg = rotp.generate_qrcode 'ralf@example.com'
+        totp = TOTP.new
+        svg = totp.generate_qrcode 'ralf@example.com'
         File.write 'otp_qrcode.svg', svg
       end
 
-      def test_verify(totp)
-        rotp = TOTP.new
-        p rotp.verify 'ralf@example.com', totp
+      def test_verify(token)
+        totp = TOTP.new
+        p totp.verify 'ralf@example.com', token
       end
     end
   end
 end
+
+# Authentication::TOTP.test_generate_qrcode
+# Authentication::TOTP.test_verify 828309

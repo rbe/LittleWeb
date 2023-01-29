@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# sx: Secure Access
-module SecureAccess
+# Cryptographic functions
+module Crypto
   # Create a hash.
   class HashGenerator
     require 'digest'

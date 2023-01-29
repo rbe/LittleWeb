@@ -66,7 +66,7 @@ module HTTP
 
     # Send HTTP 400 Bad Request
     # @param [String] message
-    def bad_request_response(message = '')
+    def bad_request_response(message = 'Bad request')
       headers = STD_HEADERS.merge('status' => 400, 'cookie' => reset_cookies)
       @cgi.out(headers) { message.to_s }
     end

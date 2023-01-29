@@ -6,24 +6,26 @@ html
     link rel="stylesheet" type="text/css" href="/assets/css/gallimaufry.css"
   body
     h1 Gallimaufry Access Request Form
-    form action="#{token.url}" method="post" enctype="text/json" autocomplete="off"
+    form action="sx/tkx" method="post" enctype="text/json" autocomplete="off"
       input type="hidden" name="__csrf_token" value="#{__csrf_token}"
-      input type="hidden" name="token" value="#{token}"
-      input type="hidden" name="hash" value="#{hash}"
+      input type="hidden" name="url" value="#{url}"
       table
         tr
           td colspan=2
             h2 Form
         tr
+          td Access to
+          td #{url}
+        tr
           td.a
             label for="user" User ID
-          td id="user" #{token.user}
+          td id="user" #{user}
         tr
+          td.a
+            label for="otp_code" OTP
           td
-            label for="otp_code" TOTP Code
-          td
-            input type="text" id="honeypot" name="honeypot" class="visually-hidden" tabindex="-1"
-            input type="text" id="otp_code" name="otp_code" size="6" value=""
+            input type="text" id="username" name="username" tabindex="-1"
+            input type="text" id="otp_code" name="otp_code" size="6" placeholder=""
         tr
           td colspan=2
             h2 Terms of Use

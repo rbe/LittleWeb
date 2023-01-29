@@ -14,9 +14,10 @@ module HTTP
 
     # @param [CGI] cgi
     def initialize(cgi)
+      @cgi = cgi
       @request = HTTP::HttpRequest.new(cgi)
       @response = HTTP::HttpResponse.new(cgi)
-      @messages = ['&nbsp']
+      @messages = []
     end
 
     # @param [String] text

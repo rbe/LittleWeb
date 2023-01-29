@@ -8,7 +8,7 @@ module DocRenderer
   # require 'asciidoctor-diagram'
 
   # Render documentation
-  class DocRenderer
+  class AsciidocRenderer
     def initialize
       @std_document_attrs = {
         'license' => 'All rights reserved. Use is subject to license terms.',
@@ -23,7 +23,7 @@ module DocRenderer
         'kroki-default-options' => 'inline',
         'kroki-default-format' => 'svg',
         'kroki-fetch-diagram' => true
-      }
+      }.freeze
     end
 
     # @param [String] file

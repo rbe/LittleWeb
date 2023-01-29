@@ -6,27 +6,29 @@ html
     link rel="stylesheet" type="text/css" href="/assets/css/gallimaufry.css"
   body
     h1 Gallimaufry Access Request Form
-    form action="#{url}" method="post" enctype="text/json" autocomplete="off"
+    form action="#{token.url}" method="post" enctype="text/json" autocomplete="off"
       input type="hidden" name="__csrf_token" value="#{__csrf_token}"
-      input type="hidden" name="operation" value="#{url}"
+      input type="hidden" name="token" value="#{token}"
+      input type="hidden" name="hash" value="#{hash}"
       table
         tr
           td colspan=2
             h2 Form
         tr
-          td Access to
-          td #{url}
-        tr
           td.a
             label for="user" User ID
+          td id="user" #{token.user}
+        tr
           td
-            input type="text" id="honeypot" name="honeypot" class="visually-hidden" tabindex="-1"
-            input type="text" id="user" name="user" size="50" placeholder="User ID"
+            label for="otp_code" TOTP Code
+          td
+            input type="text" id="username" name="username" tabindex="-1"
+            input type="text" id="otp_code" name="otp_code" size="6" value=""
         tr
           td colspan=2
             h2 Terms of Use
             p
-              span After requesting access we send an email with a link.
+              span We use cookies to store authorization!
               br
               span We don't send any information to third parties.
         tr

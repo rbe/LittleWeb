@@ -7,7 +7,7 @@ module Database
     require 'sqlite3'
 
     class << self
-      DB_FILE = 'secure_access.db'
+      DB_FILE = 'db/secure_access.db'
 
       # @param [String] stmt
       # @param [Boolean] single_tx
@@ -23,9 +23,9 @@ module Database
       # @param [Boolean] single_tx
       def execute(stmt, single_tx: false)
         SimpleDb.query do |db|
-          #db.transaction if single_tx
+          db.transaction if single_tx
           results = db.execute stmt
-          #db.commit if single_tx
+          db.commit if single_tx
           results
         end
       end
