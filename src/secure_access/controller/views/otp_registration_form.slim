@@ -6,7 +6,7 @@ html
     link rel="stylesheet" type="text/css" href="/assets/css/gallimaufry.css"
   body
     h1 Gallimaufry OTP Registration
-    form method="post" enctype="text/json" autocomplete="off"
+    form action="/Gallimaufry/sx/registration" method="post" enctype="text/json" autocomplete="off"
       input type="hidden" name="__csrf_token" value="#{__csrf_token}"
       table
         tr
@@ -17,7 +17,7 @@ html
             label for="user" User ID
           td
             input type="text" id="username" name="username" tabindex="-1"
-            input type="text" name="user" id="user" value="" size="50" placeholder="User ID"
+            input type="text" name="user" id="user" value="" size="50" maxlength="50" placeholder="User ID"
         tr
           td
           td

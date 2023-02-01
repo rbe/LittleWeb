@@ -21,16 +21,25 @@ module SecureAccess
       }.freeze
 
       def process
+        case @request.request_method
+        when 'GET'
+          proxy_file
+        else
+          @response.method_not_allowed
+        end
+      end
+
+      private
+
+      def proxy_file
         file = @request.request_uri
         file_path = "#{Constants::BASE_DIR}#{file}"
         if File.exist? file_path
           process_file(file, file_path)
         else
-          @response.notfound_response
+          @response.not_found 'Not found: proxy'
         end
       end
-
-      private
 
       def process_file(file, file_path)
         if file_path.end_with? '.adoc'
@@ -43,15 +52,15 @@ module SecureAccess
       def render_asciidoc(file_path)
         doc_renderer = DocRenderer::AsciidocRenderer.new
         content = doc_renderer.render file_path
-        @response.success_response content
+        @response.success content
       end
 
       def stream_file(file, file_path)
-        mime_type = MIME_TYPES.select { |k, _| file_path.end_with? k }
+        mime_type = MIME_TYPES.select { |k, _| file_path.end_with?(k.to_s) }.values.first
         if mime_type
-          @cgi.out(mime_type) { File.read(file_path, encoding: 'utf-8') }
+          @response.success File.read(file_path, encoding: 'utf-8'), mime_type
         else
-          @response.bad_request_response "Unknown file type #{file}"
+          @response.not_found "Unknown file type #{file}"
         end
       end
     end

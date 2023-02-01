@@ -8,15 +8,14 @@ module SecureAccess
 
     # Secure link request use case
     class AccessRequestController < HTTP::Controller
-      require 'cgi/html'
       require 'slim'
       require 'mail'
-      require_relative 'constants'
       require_relative '../../http/csrf_token'
+      require_relative '../../authentication/sx_token'
+      require_relative 'constants'
 
-      # @param [CGI] cgi
-      def initialize(cgi)
-        super(cgi)
+      def initialize(request, response)
+        super(request, response)
         @mail = Mail.new do
           delivery_method :smtp,
                           address: Constants::EMAIL_HOST_FQDN,
@@ -25,30 +24,39 @@ module SecureAccess
         end
       end
 
-      # Show form to request access
-      def render
-        bindings = {
-          '__csrf_token': HTTP::CsrfToken.new,
-          url: @request.request_uri,
-          message: @messages.join('<br/>')
-        }
-        render_view 'views/access_request_form.slim', bindings
+      def process
+        # return @response.success_response "#{ENV.inspect}<br>#{@request.inspect}"
+        case @request.request_method
+        when 'GET'
+          render_token_request_form
+        when 'POST'
+          process_token_request
+        else
+          @response.not_found 'Not found: access request'
+        end
       end
 
-      # Process submitted form
-      def process
-        # return @response.bad_request_response('Invalid token') unless @request.query_value? 'token', 'hash'
+      private
 
+      # Show form to request access
+      def render_token_request_form
+        bindings = {
+          '__csrf_token': HTTP::CsrfToken.new,
+          url: @request.original_request_uri,
+          message: @messages.join('<br/>')
+        }
+        render_view 'controller/views/access_request_form.slim', bindings
+      end
+
+      def process_token_request
         token = create_sx_token
-        return render unless token
+        return @response.forbidden "Error: token not created, #{@messages.join('<br/>')}" unless token
 
         user = validate_user
         url = validate_url
         html = access_granted_email(url, token)
         send_mail_and_response(user, url, html)
       end
-
-      private
 
       def create_sx_token
         user = validate_user
@@ -60,7 +68,7 @@ module SecureAccess
       end
 
       def validate_url
-        url = @request.request_uri
+        url = @request.query_value 'url'
         return add_message 'Invalid URL' unless url =~ %r{[A-Za-z0-9./]+}
 
         url
@@ -77,10 +85,10 @@ module SecureAccess
       # @param [SxToken] token
       def access_granted_email(url, token)
         exchange_link = lambda do |t|
-          "#{ENV['REQUEST_SCHEME']}://#{ENV['HTTP_HOST']}#{Constants::URL_PREFIX}" \
-          "/sx_exchange?token=#{t}&hash=#{t.to_hash}"
+          "#{@request.request_scheme}://#{@request.http_host}#{Constants::URL_PREFIX}" \
+          "/sx/exchange?token=#{t}&hash=#{t.to_hash}"
         end
-        template = Slim::Template.new('emails/access_granted.slim')
+        template = Slim::Template.new('controller/emails/token_exchange.slim')
         template.render(self, { url:, link: exchange_link.call(token), token: })
       end
 
@@ -89,9 +97,9 @@ module SecureAccess
       # @param [String] text
       def send_mail_and_response(user, url, text)
         send_mail user, url.to_s, text
-        template = Slim::Template.new('views/access_granted.slim')
+        template = Slim::Template.new('controller/views/access_mail_sent.slim')
         html = template.render(self, {})
-        @response.success_response html
+        @response.success html
       end
 
       # @param [String] to_address

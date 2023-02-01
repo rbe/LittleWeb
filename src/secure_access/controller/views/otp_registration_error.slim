@@ -16,7 +16,9 @@ html
         td id="user" #{user}
       tr
         td OTP Registration
-        td Failed.
+        td
+          span Failed.
+          a href="/Gallimaufry/sx/registration?user=#{user}" I'd like to try again.
       tr
         td
         td #{{message}}

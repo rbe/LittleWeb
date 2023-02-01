@@ -1,7 +1,7 @@
 @startuml
 
 autonumber
-hide footbox
+'hide footbox
 
 box Client
 actor "User" as User
@@ -11,16 +11,23 @@ participant "E-Mail Client" as EmailClient
 end box
 box Request Processing
 participant "Dispatcher" as Dispatcher
-participant "AuthenticatingFilter" as AuthFilter
+participant "Authenticating\nFilter" as AuthFilter
+participant "AccessRequest\nController" as AccessRequestController
+participant "OtpController" as OtpController
 end box
 
-User -> Browser ++ : Opens page /resource\nwithout token
-Browser -> Dispatcher ++ : HTTP GET /resource
-Dispatcher -> AuthFilter ++ : .process()
-AuthFilter -> AuthFilter : Token received?
+ref over User, OtpDevice : OTP registration process
+group Request without token
+    User -> Browser ++ : Opens page /resource\nwithout token
+    Browser -> Dispatcher ++ : HTTP GET /resource
+    Dispatcher -> AuthFilter ++ : .process()
+    AuthFilter -> AuthFilter : No or invalid\ntoken received
+    AuthFilter -> AccessRequestController ++ : .process()
+end group
 group First Factor
-    Dispatcher <-- AuthFilter -- : Identify user\nrequest
-    Browser <-- Dispatcher -- : Render "Access Request" page
+    AuthFilter <-- AccessRequestController -- : "Access Request"\npage
+    Dispatcher <-- AuthFilter -- : "Access Request"\npage
+    Browser <-- Dispatcher -- : "Access Request" page
     User <-- Browser -- : "Access Request" page
     User -> Browser ++ : Enter User ID
     note right
@@ -30,23 +37,25 @@ group First Factor
     end note
     User -> Browser : Submit form
     Browser -> Dispatcher ++ : HTTP POST /sx/access_request
-    Dispatcher -> AuthFilter ++ : .process()
+    Dispatcher -> AuthFilter ++ : .filter()
     AuthFilter -> AuthFilter : Verify user\nhas access
+    AuthFilter -> AuthFilter : Create token\nexchange link
+    AuthFilter -> AuthFilter : Send email
+    Dispatcher <-- AuthFilter -- : Result
+    Browser <-- Dispatcher -- : Sucess page
+    User <-- Browser -- : Success page
+    ref over User, EmailClient : User checks mails
+    User -> EmailClient ++ : Click token exchange link
+    EmailClient -> Browser -- : Open browser: exchange link\nto sx_token
+    Browser ++
+    Browser -> Dispatcher ++ : HTTP GET /resource?token=...&hash=...
+    Dispatcher -> AuthFilter ++ : .process()
+    AuthFilter -> AuthFilter : Verify token
+    AuthFilter -> AccessRequestController ++ : .process()
 end group
-AuthFilter -> AuthFilter : Create token\nexchange request
-AuthFilter -> AuthFilter : Send email
-Dispatcher <-- AuthFilter -- : Result
-Browser <-- Dispatcher -- : Sucess page
-User <-- Browser -- : Success page
-ref over User, EmailClient : User checks mails
-User -> EmailClient ++ : Click token exchange link
-EmailClient -> Browser -- : Open browser: exchange link\nto sx_token
-Browser ++
-Browser -> Dispatcher ++ : HTTP GET /resource?token=...&hash=...
-Dispatcher -> AuthFilter ++ : .process()
-AuthFilter -> AuthFilter : Verify token
-Dispatcher <-- AuthFilter -- : Result
 group Second Factor
+    AuthFilter <-- AccessRequestController -- : "Enter OTP" page
+    Dispatcher <-- AuthFilter -- : "Enter OTP" page
     Browser <-- Dispatcher -- : "Enter OTP" page
     User <-- Browser -- : "Enter OTP" page
     note right
@@ -59,7 +68,8 @@ group Second Factor
     User -> Browser ++ : Enter OTP
     User -> Browser : Submit form
     Browser -> Dispatcher ++ : OTP
-    Dispatcher -> AuthFilter ++
+    Dispatcher -> AuthFilter ++ : OTP
+    AuthFilter -> AuthFilter : Verify OTP
     AuthFilter -> AuthFilter : Create token
     Dispatcher <-- AuthFilter -- : Token
     Browser <-- Dispatcher -- : HTTP 307 Redirect\nLocation: /resource\nSet-Cookie: ...

@@ -11,14 +11,16 @@ module SecureAccess
       require_relative '../../authentication/totp'
 
       def process
-        return @response.bad_request_response('Missing request data') unless @request.query_value? 'token', 'hash', 'otp_code'
+        unless @request.query_value? 'token', 'hash', 'otp_code'
+          return @response.bad_request('Missing request data')
+        end
 
         token = @request.query_value 'token'
         hash = @request.query_value 'hash'
         otp_code = @request.query_value 'otp_code'
-        return @response.bad_request_response 'TOTP invalid' unless Authentication::TOTP.new.verify user, otp_code
+        return @response.bad_request 'TOTP invalid' unless Authentication::TOTP.new.verify user, otp_code
 
-        @response.redirect_with_cookie_response()
+        @response.redirect()
       end
     end
   end

@@ -4,14 +4,30 @@
 module HTTP
   # Helper for HTTP requests
   class HttpRequest
+    attr_reader :request_scheme, :http_host, :request_method,
+                :request_uri, :original_request_uri,
+                :query_string
+
     def initialize(cgi)
       @cgi = cgi
+      @request_scheme = ENV['REQUEST_SCHEME'].strip
+      @http_host = ENV['HTTP_HOST'].strip
+      @request_method = ENV['REQUEST_METHOD'].strip
+      @request_uri = sanitize ENV['REQUEST_URI'].strip, ['?']
+      @query_string = sanitize ENV['QUERY_STRING'], ['&']
+      @extra = {}
     end
 
-    def request_uri
-      '' unless ENV.key? 'REQUEST_URI'
-      url = ENV['REQUEST_URI'].strip
-      sanitize url
+    def http_get?
+      @request_method == 'GET'
+    end
+
+    def http_post?
+      @request_method == 'POST'
+    end
+
+    def http_host_only
+      @http_host.split(':')[0]
     end
 
     # @param [Array<String>] names
@@ -42,6 +58,28 @@ module HTTP
       sanitize kv[1]
     end
 
+    def [](key)
+      @extra[key]
+    end
+
+    def []=(key, value)
+      @extra[key] = value
+    end
+
+    def modify(method:, uri:)
+      modify_request_method method
+      modify_request_uri uri
+    end
+
+    def modify_request_method(new_request_method)
+      @request_method = new_request_method
+    end
+
+    def modify_request_uri(new_request_uri)
+      @original_request_uri = @request_uri
+      @request_uri = new_request_uri
+    end
+
     class << self
       def test_cookie_value?
         require 'cgi'
@@ -57,6 +95,8 @@ module HTTP
     # @param [String] str
     # @param [Array] extra_chars
     def sanitize(str, extra_chars = [])
+      return unless str
+
       ords = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+-,.-_=/@'.chars.map(&:ord)
       extra_ords = extra_chars.map(&:ord)
       str.codepoints.filter { |e| ords.include?(e) || extra_ords.include?(e) }.map(&:chr).join('')

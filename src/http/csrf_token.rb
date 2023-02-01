@@ -9,7 +9,6 @@ module HTTP
     require_relative '../database/simple_db'
 
     def initialize(token = nil)
-      init_db
       unless token
         token = CsrfToken.generate_token
         insert_token_db(token)
@@ -45,15 +44,6 @@ module HTTP
 
     def cleanup
       Database::SimpleDb.execute "DELETE FROM csrf_token WHERE valid_until < datetime('now', 'localtime', '+10 minutes')"
-    end
-
-    def init_db
-      Database::SimpleDb.create_table <<-SQL
-        CREATE TABLE IF NOT EXISTS csrf_token (
-          csrf CHAR(44) UNIQUE
-          , valid_until DATETIME DEFAULT (datetime('now', 'localtime', '+10 minutes'))
-        )
-      SQL
     end
 
     class << self

@@ -27,8 +27,16 @@ services:
     restart: "no"
     environment:
       - TZ=Europe/Berlin
+      - GM_URL_PREFIX=/Gallimaufry
+      - GM_DB_FILE=/db/secure_access.db
+      - GM_BASE_DIR=/data
+      - GM_OTP_ISSUER=example.com
+      - GM_EMAIL_HOST_FQDN=mailhog
+      - GM_EMAIL_HOST_PORT=1025
+      - GM_EMAIL_FROM=gallimaufry@example.com
     volumes:
-      - ./src:/home/rbe/cgi-bin:rw #,exec
+      - ./src:/home/rbe/cgi-bin:ro #,exec
+      - ./db:/db:rw
       - ../:/data:rw
     networks:
       - backend

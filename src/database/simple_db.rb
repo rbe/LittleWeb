@@ -2,13 +2,13 @@
 
 # Database
 module Database
+  DB_FILE = ENV['GM_DB_FILE'] || 'db/secure_access.db'
+
   # Simple database
   class SimpleDb
     require 'sqlite3'
 
     class << self
-      DB_FILE = 'db/secure_access.db'
-
       # @param [String] stmt
       # @param [Boolean] single_tx
       def create_table(stmt, single_tx: false)
@@ -35,20 +35,15 @@ module Database
 
         db = nil
         begin
-          db = if File.exist? DB_FILE
-                 SQLite3::Database.open DB_FILE
-               else
-                 SQLite3::Database.new DB_FILE
-               end
-          db.results_as_hash = true
+          db = open_database
           block.call(db)
         rescue SQLite3::Exception => e
-          p e
+          raise e
         ensure
           begin
             db&.close
           rescue SQLite3::BusyException
-            p 'SQLite is busy while trying to close db'
+            # p 'SQLite is busy while trying to close db'
           end
         end
       end
@@ -70,6 +65,18 @@ module Database
             # results.each { |row| puts row }
           end
         end
+      end
+
+      private
+
+      def open_database
+        db = if File.exist? Database::DB_FILE
+               SQLite3::Database.open Database::DB_FILE
+             else
+               SQLite3::Database.new Database::DB_FILE
+             end
+        db.results_as_hash = true
+        db
       end
     end
   end

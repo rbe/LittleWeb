@@ -12,11 +12,11 @@ module HTTP
 
     attr_reader :messages
 
-    # @param [CGI] cgi
-    def initialize(cgi)
-      @cgi = cgi
-      @request = HTTP::HttpRequest.new(cgi)
-      @response = HTTP::HttpResponse.new(cgi)
+    # @param [HTTP::HttpRequest] request
+    # @param [HTTP::HttpResponse] response
+    def initialize(request, response)
+      @request = request
+      @response = response
       @messages = []
     end
 
@@ -25,13 +25,17 @@ module HTTP
       @messages << text
     end
 
+    def messages_as_html
+      @messages.join('<br/>')
+    end
+
     # @param [String] file
     # @param [Hash] bindings
     # @return [String] Value of @cgi.out
     def render_view(file, bindings = {})
       template = Slim::Template.new file
       content = template.render self, bindings
-      @response.success_response content
+      @response.success content
     end
 
     # @param [String] file

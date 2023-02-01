@@ -51,6 +51,11 @@ module Authentication
       from_s value
     end
 
+    # @param [String] cookie value
+    def from_cookie_value(value)
+      from_s value
+    end
+
     def to_hash
       @hash = Crypto::HashGenerator.new.make_md5 "#{user}#{url}#{expires.to_i}"
     end
@@ -63,10 +68,19 @@ module Authentication
       to_base64 "#{user},#{url},#{expires.to_i}"
     end
 
-    def bake_cookies
+    # @param [HTTP::HttpRequest] request
+    def bake_cookies(request)
+      std = {
+        'domain' => request.http_host_only,
+        'path' => '/',
+        'expires' => Time.now + Constants::EXPIRE_IN_SECONDS,
+        'secure' => request.request_scheme == 'https',
+        'httponly' => true,
+        'samesite' => 'strict'
+      }
       [
-        HTTP::HttpResponse.create_cookie('sx_token', to_s, STD_COOKIE),
-        HTTP::HttpResponse.create_cookie('sx_hash', to_hash, STD_COOKIE)
+        HTTP::HttpResponse.create_cookie('sx_token', to_s, std),
+        HTTP::HttpResponse.create_cookie('sx_hash', to_hash, std)
       ]
     end
 
@@ -76,9 +90,8 @@ module Authentication
 
     # @param [String] url
     def valid?(url)
-      return false if url.nil? || @expires.nil?
-
-      access?(@user, url) && Time.now < @expires
+      # TODO: Sanitize URL
+      access?(@user, url) && Time.now < @expires unless @user.nil? || url.nil? || @expires.nil?
     end
 
     # @param [String] url
