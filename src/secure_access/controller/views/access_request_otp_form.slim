@@ -14,16 +14,16 @@ html
           td colspan=2
             h2 Form
         tr
-          td Access to
-          td #{url}
+          td.a Access to
+          td.b #{url}
         tr
           td.a
             label for="user" User ID
-          td id="user" #{user}
+          td.b id="user" #{user}
         tr
           td.a
             label for="otp_code" OTP
-          td
+          td.b
             input type="text" id="username" name="username" tabindex="-1"
             input type="text" id="otp_code" name="otp_code" size="6" placeholder=""
         tr
@@ -34,9 +34,9 @@ html
               br
               span We don't send any information to third parties.
         tr
-          td
-          td
+          td.a
+          td.b
             input type="submit" value="Yes, I agree"
         tr
-          td
-          td #{{message}}
+          td.a
+          td.b #{{message}}

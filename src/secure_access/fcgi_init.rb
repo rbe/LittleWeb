@@ -2,13 +2,13 @@
 # frozen_string_literal: true
 
 # Initialize database
-module InitDb
+module FcgiInit
 
   def run
     Database::SimpleDb.create_table <<-SQL
         CREATE TABLE IF NOT EXISTS csrf_token (
             csrf CHAR(44) NOT NULL UNIQUE
-          , valid_until DATETIME DEFAULT (datetime('now', 'localtime', '+10 minutes'))
+          , valid_until DATETIME DEFAULT (datetime('now', 'localtime', '+5 minutes'))
         )
         CREATE TABLE IF NOT EXISTS otp (
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -22,4 +22,4 @@ module InitDb
   module_function :run
 end
 
-InitDb.run
+FcgiInit.run

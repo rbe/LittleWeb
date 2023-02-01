@@ -35,17 +35,17 @@ module SecureAccess
         file = @request.request_uri
         file_path = "#{Constants::BASE_DIR}#{file}"
         if File.exist? file_path
-          process_file(file, file_path)
+          process_file file, file_path
         else
-          @response.not_found 'Not found: proxy'
+          @response.not_found 'Not found'
         end
       end
 
       def process_file(file, file_path)
         if file_path.end_with? '.adoc'
-          render_asciidoc(file_path)
+          render_asciidoc file_path
         else
-          stream_file(file, file_path)
+          stream_file file, file_path
         end
       end
 

@@ -28,35 +28,32 @@ module DocRenderer
 
     # @param [String] file
     def render(file)
-      absolute_dir, output_file = output_file(file)
-      output_file_path = "#{absolute_dir}/#{output_file}"
-      if render?(output_file_path)
-        asciidoc_to_html(file)
-      else
-        File.read(output_file_path, encoding: 'utf-8')
-      end
+      # absolute_dir, output_file = output_file file
+      # output_file_path = "#{absolute_dir}/#{output_file}"
+      # if renderable? output_file_path
+      asciidoc_to_html file
+      # else
+      #  File.read output_file_path, encoding: 'utf-8'
+      # end
     end
 
     private
 
-    def render?(file_path)
-      updated = File.exist?(file_path)
-      # && (File.mtime(file_path) < Time.now - 1 * 60)
-      # $stderr.puts("LOG updated=#{updated}: mtime=#{File.mtime(file_path)} < reference=#{Time.now - 1 * 60}")
-      updated
+    def renderable?(file_path)
+      File.exist? file_path
     end
 
     # @param [String] file
     def asciidoc_to_html(file)
-      opts = asciidoctor_options(file)
+      opts = asciidoctor_options file
       Asciidoctor.convert_file file, opts
-      File.read(opts[:to_file], encoding: 'utf-8')
+      File.read opts[:to_file], encoding: 'utf-8'
     end
 
     # @param [String] file
     # @return [Hash<String, String>]
     def asciidoctor_options(file)
-      absolute_dir, output_file = output_file(file)
+      absolute_dir, output_file = output_file file
       {
         doctype: 'book',
         backend: 'html5',
@@ -70,7 +67,7 @@ module DocRenderer
 
     # @param [String] file
     def output_file(file)
-      absolute_dir = File.dirname File.absolute_path(file)
+      absolute_dir = File.dirname File.absolute_path file
       pure_file_name = File.basename file, '.adoc'
       file_name = "#{pure_file_name}.html"
       [absolute_dir, file_name]

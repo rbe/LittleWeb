@@ -95,7 +95,7 @@ module HTTP
     # @param [String] str
     # @param [Array] extra_chars
     def sanitize(str, extra_chars = [])
-      return unless str
+      return '' unless str
 
       ords = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+-,.-_=/@'.chars.map(&:ord)
       extra_ords = extra_chars.map(&:ord)

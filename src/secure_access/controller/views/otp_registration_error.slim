@@ -13,12 +13,12 @@ html
       tr
         td.a
           label for="user" User ID
-        td id="user" #{user}
+        td.b id="user" #{user}
       tr
-        td OTP Registration
-        td
+        td.a OTP Registration
+        td.b
           span Failed.
-          a href="/Gallimaufry/sx/registration?user=#{user}" I'd like to try again.
+          a href="/Gallimaufry/registration?user=#{user}" I'd like to try again.
       tr
-        td
-        td #{{message}}
+        td.a
+        td.b #{{message}}

@@ -6,7 +6,7 @@ html
     link rel="stylesheet" type="text/css" href="/assets/css/gallimaufry.css"
   body
     h1 Gallimaufry OTP Registration
-    form action="/Gallimaufry/sx/registration" method="post" enctype="text/json" autocomplete="off"
+    form action="/Gallimaufry/registration" method="post" enctype="text/json" autocomplete="off"
       input type="hidden" name="__csrf_token" value="#{__csrf_token}"
       input type="hidden" name="user" value="#{user}"
       table
@@ -16,21 +16,21 @@ html
         tr
           td.a
             label for="user" User ID
-          td id="user" #{user}
+          td.b id="user" #{user}
         tr
-          td OTP Registration
-          td
+          td.a OTP Registration
+          td.b
             img alt="OTP" src="data:image/svg+xml;base64,#{otp_svg}"
         tr
-          td
+          td.a
             label for="otp_code" OTP Code
-          td
+          td.b
             input type="text" id="username" name="username" tabindex="-1"
             input type="text" id="otp_code" name="otp_code" size="6" maxlength="6" value=""
         tr
-          td
-          td
+          td.a
+          td.b
             input type="submit" value="Complete registration"
         tr
-          td
-          td #{{message}}
+          td.a
+          td.b #{{message}}

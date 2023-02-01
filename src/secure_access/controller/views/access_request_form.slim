@@ -6,7 +6,7 @@ html
     link rel="stylesheet" type="text/css" href="/assets/css/gallimaufry.css"
   body
     h1 Gallimaufry Access Request Form
-    form action="/Gallimaufry/sx/access_request" method="post" enctype="text/json" autocomplete="off"
+    form action="/Gallimaufry/access_request" method="post" enctype="text/json" autocomplete="off"
       input type="hidden" name="__csrf_token" value="#{__csrf_token}"
       input type="hidden" name="url" value="#{url}"
       table
@@ -14,12 +14,12 @@ html
           td colspan=2
             h2 Form
         tr
-          td Access to
-          td #{url}
+          td.a Access to
+          td.b #{url}
         tr
           td.a
             label for="user" User ID
-          td
+          td.b
             input type="text" id="username" name="username" tabindex="-1"
             input type="text" id="user" name="user" size="50" placeholder="User ID"
         tr
@@ -30,9 +30,9 @@ html
               br
               span We don't send any information to third parties.
         tr
-          td
-          td
+          td.a
+          td.b
             input type="submit" value="Yes, I agree"
         tr
-          td
-          td #{{message}}
+          td.a
+          td.b #{{message}}

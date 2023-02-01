@@ -72,6 +72,9 @@ http {
         location /assets/ {
             root /;
         }
+        location = /Gallimaufry {
+            return 301 /Gallimaufry/;
+        }
         location /Gallimaufry/ {
             root /data;
             access_log /proc/self/fd/1 main;

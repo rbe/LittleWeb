@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 RUBY_VERSION="3.2.0"
+RUBY_BASE="/home"
 
 set -o nounset
 set -o errexit
@@ -8,7 +9,7 @@ set -o errexit
 . "${HOME}/.asdf/asdf.sh"
 asdf global ruby "${RUBY_VERSION}"
 
-GEMFILES="$(find /home -type f -name Gemfile)"
+mapfile -t GEMFILES < <(find "${RUBY_BASE}" -type f -name Gemfile)
 for gemfile in "${GEMFILES[@]}"
 do
   PROJECT_DIR="$(dirname "${gemfile}")"
@@ -20,6 +21,15 @@ do
   popd >/dev/null
 done
 gem list
+
+echo -n "Executing initialization scripts..."
+mapfile -t INIT_SCRIPTS < <(find "${RUBY_BASE}" -type f -name fcgi_init.rb)
+for script in "${INIT_SCRIPTS[@]}"
+do
+  echo -n " ${script}"
+  ruby "${script}"
+done
+echo "done"
 
 echo -n "* Starting fcgiwrap... "
 fcgiwrap -f -c 10 -s tcp:0.0.0.0:9000

@@ -32,7 +32,7 @@ module SecureAccess
         when 'POST'
           process_token_request
         else
-          @response.not_found 'Not found: access request'
+          @response.method_not_allowed
         end
       end
 

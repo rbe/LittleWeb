@@ -7,24 +7,30 @@ module SecureAccess
   require_relative 'filter/honeypot_filter'
   require_relative 'filter/csrf_token_filter'
   require_relative 'filter/authentication_filter'
+  require_relative 'filter/authorization_filter'
   require_relative 'dispatcher/front_dispatcher'
+
+  PROTECTED_URLS = [
+    %r{/*}
+  ].freeze
+
+  UNPROTECTED_URLS = [
+    %r{^.*/registration.*$},
+    %r{^.*/access_request.*$},
+    %r{^.*/exchange.*$},
+    %r{^.*/debug_.+},
+    %r{^.*/$}
+  ].freeze
 
   @request_filter_chain = [
     RequestFilter::HoneypotFilter.new,
     RequestFilter::CsrfTokenFilter.new,
-    RequestFilter::AuthenticationFilter.new(
-      [
-        %r{/*}
-      ],
-      [
-        %r{.*/sx/.+},
-        %r{.*/debug_.+}
-      ]
-    )
+    RequestFilter::AuthenticationFilter.new(PROTECTED_URLS, UNPROTECTED_URLS),
+    RequestFilter::AuthorizationFilter.new
   ]
 
   def run
-    cgi = CGI.new('html5')
+    cgi = CGI.new 'html5'
     request = HTTP::HttpRequest.new(cgi)
     response = HTTP::HttpResponse.new(cgi)
     HTTP::FilterChain.new(@request_filter_chain).filter(request, response)
@@ -65,5 +71,11 @@ def test_registration
   ENV['REQUEST_URI'] = '/sx/registration'
 end
 
-# test_unauthenticated
+def test_index
+  ENV['REQUEST_SCHEME'] = 'http'
+  ENV['HTTP_HOST'] = 'localhost'
+  ENV['REQUEST_METHOD'] = 'GET'
+  ENV['REQUEST_URI'] = '/sx'
+end
+
 SecureAccess.run
