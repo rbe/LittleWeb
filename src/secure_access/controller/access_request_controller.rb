@@ -24,8 +24,14 @@ module SecureAccess
         end
       end
 
+      def processable?
+        return true if @request.query_value? 'user'
+
+        @response.redirect '/Gallimaufry/'
+        false
+      end
+
       def process
-        # return @response.success_response "#{ENV.inspect}<br>#{@request.inspect}"
         case @request.request_method
         when 'GET'
           render_token_request_form
@@ -43,41 +49,44 @@ module SecureAccess
         bindings = {
           '__csrf_token': HTTP::CsrfToken.new,
           url: @request.original_request_uri,
-          message: @messages.join('<br/>')
+          message: messages_as_html
         }
         render_view 'controller/views/access_request_form.slim', bindings
       end
 
       def process_token_request
         token = create_sx_token
-        return @response.forbidden "Error: token not created, #{@messages.join('<br/>')}" unless token
+        return @response.forbidden messages_as_html unless token
 
         user = validate_user
         url = validate_url
-        html = access_granted_email(url, token)
-        send_mail_and_response(user, url, html)
+        html = access_granted_email url, token
+        send_mail_and_response user, url, html
       end
 
       def create_sx_token
         user = validate_user
         url = validate_url
-        token = Authentication::SxToken.new.with user, url
-        return add_message 'No access to URL' unless token.access? user, url
+        return if user.nil_or_empty? || token.nil_or_empty? || url.nil_or_empty?
 
-        token
+        Authentication::SxToken.new.with user, url
       end
 
       def validate_url
         url = @request.query_value 'url'
-        return add_message 'Invalid URL' unless url =~ %r{[A-Za-z0-9./]+}
-
+        unless url =~ %r{[A-Za-z0-9./]+}
+          add_message 'Invalid URL'
+          return ''
+        end
         url
       end
 
       def validate_user
         user = @request.query_value 'user'
-        return add_message 'Invalid user' unless user =~ URI::MailTo::EMAIL_REGEXP
-
+        unless user =~ URI::MailTo::EMAIL_REGEXP
+          add_message 'Invalid user'
+          return ''
+        end
         user
       end
 
@@ -88,7 +97,7 @@ module SecureAccess
           "#{@request.request_scheme}://#{@request.http_host}#{Constants::URL_PREFIX}" \
           "/sx/exchange?token=#{t}&hash=#{t.to_hash}"
         end
-        template = Slim::Template.new('controller/emails/token_exchange.slim')
+        template = Slim::Template.new 'controller/emails/token_exchange.slim'
         template.render(self, { url:, link: exchange_link.call(token), token: })
       end
 
@@ -97,7 +106,7 @@ module SecureAccess
       # @param [String] text
       def send_mail_and_response(user, url, text)
         send_mail user, url.to_s, text
-        template = Slim::Template.new('controller/views/access_mail_sent.slim')
+        template = Slim::Template.new 'controller/views/access_mail_sent.slim'
         html = template.render(self, {})
         @response.success html
       end

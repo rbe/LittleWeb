@@ -20,6 +20,11 @@ module HTTP
       @messages = []
     end
 
+    # Is request processable by this controller?
+    def processable?
+      true
+    end
+
     # @param [String] text
     def add_message(text)
       @messages << text

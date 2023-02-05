@@ -3,15 +3,12 @@
 # sx: Secure Access
 module SecureAccess
   # HTTP request filter chain
-  module RequestFilter
+  module HttpFilter
     # If someone put a hand on our honeypot...
     class HoneypotFilter
       def filter(request, response, chain)
-        if request.query_value? 'username'
-          response.bad_request
-        else
-          chain.filter(request, response)
-        end
+        response.bad_request if request.query_value? 'username'
+        chain.filter(request, response)
       end
     end
   end

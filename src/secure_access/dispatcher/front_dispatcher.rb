@@ -24,9 +24,7 @@ module SecureAccess
 
       # Dispatch
       def dispatch
-        return if @response.response_written
-        # return @response.success "#{@request.inspect} #{full_request_uri}"
-
+        # TODO: Generify
         controller = case full_request_uri
                      when %r{^.*/registration.*$}
                        Controller::OtpRegistrationController.new(@request, @response)
@@ -39,9 +37,10 @@ module SecureAccess
                      when %r{^.*/$}
                        Controller::IndexController.new(@request, @response)
                      else
-                       # TODO: @request.authorized?
                        Controller::SimpleProxyController.new(@request, @response)
                      end
+        return @response.server_error 'Not processable' unless controller.processable?
+
         controller.process
         # rescue StandardError => e
         # handle_error(e)

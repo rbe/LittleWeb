@@ -2,8 +2,12 @@
 
 # HTTP
 module HTTP
+  require_relative 'aa_request'
+
   # Helper for HTTP requests
   class HttpRequest
+    include AARequest
+
     attr_reader :request_scheme, :http_host, :request_method,
                 :request_uri, :original_request_uri,
                 :query_string
@@ -58,14 +62,6 @@ module HTTP
       sanitize kv[1]
     end
 
-    def [](key)
-      @extra[key]
-    end
-
-    def []=(key, value)
-      @extra[key] = value
-    end
-
     def modify(method:, uri:)
       modify_request_method method
       modify_request_uri uri
@@ -80,16 +76,6 @@ module HTTP
       @request_uri = new_request_uri
     end
 
-    class << self
-      def test_cookie_value?
-        require 'cgi'
-        ENV['REQUEST_METHOD'] = 'GET'
-        ENV['REQUEST_URI'] = '/bla'
-        ENV['QUERY_STRING'] = 'user=ralf%40bensmann.com'
-        p HTTP::HttpRequest.new(CGI.new).cookie_value? 'a'
-      end
-    end
-
     private
 
     # @param [String] str
@@ -100,6 +86,16 @@ module HTTP
       ords = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+-,.-_=/@'.chars.map(&:ord)
       extra_ords = extra_chars.map(&:ord)
       str.codepoints.filter { |e| ords.include?(e) || extra_ords.include?(e) }.map(&:chr).join('')
+    end
+
+    class << self
+      def test_cookie_value?
+        require 'cgi'
+        ENV['REQUEST_METHOD'] = 'GET'
+        ENV['REQUEST_URI'] = '/bla'
+        ENV['QUERY_STRING'] = 'user=ralf%40bensmann.com'
+        p HTTP::HttpRequest.new(CGI.new).cookie_value? 'a'
+      end
     end
   end
 end

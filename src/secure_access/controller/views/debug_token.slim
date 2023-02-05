@@ -7,6 +7,10 @@ html
   body
     h1 Debug Token
     table
+      thead
+        tr
+          td.a
+          td.b Hello!
       tr
         td Message
         td #{message}
@@ -31,9 +35,6 @@ html
       tr
         td Token timed out?
         td #{token&.timed_out?}
-      tr
-        td File
-        td #{file} -> #{token&.access? token.user, file}
       tr
         td Token valid for file?
         td #{token&.valid? file}

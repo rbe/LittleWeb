@@ -40,11 +40,12 @@ module Database
         rescue SQLite3::Exception => e
           raise e
         ensure
-          begin
-            db&.close
-          rescue SQLite3::BusyException
-            # p 'SQLite is busy while trying to close db'
-          end
+          db&.close
+          # begin
+          #  db&.close
+          # rescue SQLite3::BusyException
+          #  # p 'SQLite is busy while trying to close db'
+          # end
         end
       end
 

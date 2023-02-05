@@ -7,10 +7,17 @@ module SecureAccess
     require_relative '../../http/controller'
 
     # Exchange link with token and hash to cookies
-    # Perform 2FA through TOTP
+    # Perform 2FA through OTP
     class ExchangeController < HTTP::Controller
       require_relative '../../authentication/sx_token'
       require_relative '../../authentication/totp'
+
+      def processable?
+        @response.bad_request 'No token' unless @request.query_value? 'token', 'hash'
+        token = Authentication::SxToken.new.from_s @request.query_value 'token'
+        hash = @request.query_value 'hash'
+        @response.bad_request 'Invalid token' unless token === hash
+      end
 
       def process
         case @request.request_method
@@ -26,29 +33,27 @@ module SecureAccess
       private
 
       def render_otp_form
-        check_exchange
+        token = @request.query_value 'token'
+        hash = @request.query_value 'hash'
         bindings = {
           '__csrf_token': HTTP::CsrfToken.new,
-          token: @token,
-          hash: @hash,
-          message: @messages.join('<br/>')
+          token:,
+          hash:,
+          message: messages_as_html
         }
         render_view 'controller/views/exchange_form.slim', bindings
       end
 
       def process_exchange_with_otp_code
-        return @response.bad_request 'Missing token, hash' unless @request.query_value? 'token', 'hash'
+        ok = Authentication::TOTP.new.verify @request.query_value('user'),
+                                             @request.query_value('otp_code')
+        return @response.bad_request 'Bad OTP' unless ok
 
-        check_exchange
-        bad_request 'Something went wrong' unless @response.redirect(@token.url, @token.bake_cookies(@request))
-      end
-
-      def check_exchange
-        @token = Authentication::SxToken.new.from_s @request.query_value('token')
-        return @response.bad_request 'No token' unless @token
-
-        @hash = @request.query_value('hash')
-        @response.bad_request 'Invalid token or hash' unless @token == @hash
+        hash = @request.query_value 'hash'
+        token = Authentication::SxToken.new.from_s @request.query_value 'token'
+        unless token === hash && @response.redirect(token.url, token.bake_cookies(@request))
+          @response.bad_request 'Something went wrong'
+        end
       end
     end
   end

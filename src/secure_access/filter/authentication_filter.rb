@@ -3,7 +3,7 @@
 # sx: Secure Access
 module SecureAccess
   # HTTP request filter chain
-  module RequestFilter
+  module HttpFilter
     # Validate sx_token
     class AuthenticationFilter
       # @param [Array<Regex>] include_urls
@@ -31,10 +31,10 @@ module SecureAccess
       def process_sx_cookies(request)
         token = Authentication::SxToken.new.from_cookie_value request.cookie_value('sx_token')
         hash = request.cookie_value 'sx_hash'
-        if (token == hash) && token.valid?(request.request_uri)
-          request[:token] = token
-          request[:hash] = hash
+        if (token === hash) && token.valid?(request.request_uri)
+          request.authenticate token, hash
         else
+          request.unauthenticate
           request.modify method: 'GET', uri: '/sx/access_request'
         end
       end

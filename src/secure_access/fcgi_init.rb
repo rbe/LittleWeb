@@ -3,6 +3,7 @@
 
 # Initialize database
 module FcgiInit
+  require_relative '../database/simple_db'
 
   def run
     Database::SimpleDb.create_table <<-SQL
@@ -10,6 +11,8 @@ module FcgiInit
             csrf CHAR(44) NOT NULL UNIQUE
           , valid_until DATETIME DEFAULT (datetime('now', 'localtime', '+5 minutes'))
         )
+    SQL
+    Database::SimpleDb.create_table <<-SQL
         CREATE TABLE IF NOT EXISTS otp (
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
           , validated_at DATETIME CHECK(validated_at > created_at)

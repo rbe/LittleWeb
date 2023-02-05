@@ -12,9 +12,10 @@ html
       input type="hidden" name="hash" value="#{hash}"
       input type="hidden" name="url" valur="#{token.url}"
       table
-        tr
-          td colspan=2
-            h2 Form
+        thead
+          tr
+            td.a
+            td.b Hello!
         tr
           td.a
             label for="user" User ID
@@ -37,5 +38,5 @@ html
           td.b
             input type="submit" value="Yes, I agree"
         tr
-          td.a
+          td.a Messages
           td.b #{{message}}

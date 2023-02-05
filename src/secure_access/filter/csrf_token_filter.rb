@@ -3,7 +3,7 @@
 # sx: Secure Access
 module SecureAccess
   # HTTP request filter chain
-  module RequestFilter
+  module HttpFilter
     # Validate CSRF token (when is given in request)
     # There's no HTTP POST without a CSRF token
     class CsrfTokenFilter

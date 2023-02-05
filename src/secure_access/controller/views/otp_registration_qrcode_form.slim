@@ -10,9 +10,10 @@ html
       input type="hidden" name="__csrf_token" value="#{__csrf_token}"
       input type="hidden" name="user" value="#{user}"
       table
-        tr
-          td colspan=2
-            h2 Form
+        thead
+          tr
+            td.a
+            td.b Hello!
         tr
           td.a
             label for="user" User ID
@@ -32,5 +33,5 @@ html
           td.b
             input type="submit" value="Complete registration"
         tr
-          td.a
+          td.a Messages
           td.b #{{message}}

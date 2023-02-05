@@ -33,18 +33,6 @@ module HTTP
       @response_written = false
     end
 
-    # @param [String] name Cookie name
-    # @param [String] value Cookie value
-    # @param [Hash] std Cookie value
-    def self.create_cookie(name, value, std = {})
-      values = std.merge({
-                           'name' => name,
-                           'path' => '/',
-                           'value' => value
-                         })
-      CGI::Cookie.new(values)
-    end
-
     # Send HTTP 200 OK response (with cookie)
     # @param [String] body
     # @param [String] content_type
@@ -127,6 +115,20 @@ module HTTP
         CGI::Cookie.new({ 'name' => 'sx_token' }.merge(values)).to_s,
         CGI::Cookie.new({ 'name' => 'sx_hash' }.merge(values)).to_s
       ]
+    end
+
+    class << self
+      # @param [String] name Cookie name
+      # @param [String] value Cookie value
+      # @param [Hash] std Cookie value
+      def create_cookie(name, value, std = {})
+        values = std.merge({
+                             'name' => name,
+                             'path' => '/',
+                             'value' => value
+                           })
+        CGI::Cookie.new(values)
+      end
     end
   end
 end

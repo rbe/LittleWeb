@@ -1,5 +1,6 @@
 FROM ubuntu:latest AS base
 ENV TZ=Europe/Berlin
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
   && apt-get -y upgrade \
   && apt-get -y install --no-install-recommends \
@@ -9,16 +10,16 @@ RUN apt-get update \
 FROM base AS apps
 ARG ASDF_VERSION=v0.11.1
 ENV TZ=Europe/Berlin
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
   && apt-get -y upgrade \
   && apt-get -y install --no-install-recommends \
-      fcgiwrap graphviz plantuml \
+      fcgiwrap sqlite3-tools litecli graphviz plantuml \
   && rm -rf /var/lib/apt/lists/* \
   && git clone https://github.com/asdf-vm/asdf.git "${HOME}/.asdf" --branch "${ASDF_VERSION}"
 
 FROM apps AS apps-ruby-gems
 COPY --from=apps /root/.asdf /root/.asdf
 COPY *.sh /usr/local/bin/
-RUN chmod 555 /usr/local/bin/*.sh \
-  && install-ruby.sh
+RUN chmod 555 /usr/local/bin/*.sh
 CMD ["docker-entrypoint.sh"]

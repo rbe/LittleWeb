@@ -22,19 +22,19 @@ module SecureAccess
     %r{^.*/$}
   ].freeze
 
-  @request_filter_chain = [
-    RequestFilter::HoneypotFilter.new,
-    RequestFilter::CsrfTokenFilter.new,
-    RequestFilter::AuthenticationFilter.new(PROTECTED_URLS, UNPROTECTED_URLS),
-    RequestFilter::AuthorizationFilter.new
+  @http_filter_chain = [
+    HttpFilter::HoneypotFilter.new,
+    HttpFilter::CsrfTokenFilter.new,
+    HttpFilter::AuthenticationFilter.new(PROTECTED_URLS, UNPROTECTED_URLS),
+    HttpFilter::AuthorizationFilter.new(PROTECTED_URLS, UNPROTECTED_URLS)
   ]
 
   def run
     cgi = CGI.new 'html5'
     request = HTTP::HttpRequest.new(cgi)
     response = HTTP::HttpResponse.new(cgi)
-    HTTP::FilterChain.new(@request_filter_chain).filter(request, response)
-    Dispatcher::FrontDispatcher.new(request, response).dispatch
+    HTTP::FilterChain.new(@http_filter_chain).filter(request, response)
+    Dispatcher::FrontDispatcher.new(request, response).dispatch unless @response.written
   end
 
   module_function :run
