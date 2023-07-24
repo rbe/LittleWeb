@@ -36,7 +36,7 @@ module SecureAccess
     request = HTTP::HttpRequest.new(cgi)
     response = HTTP::HttpResponse.new(cgi)
     HTTP::FilterChain.new(@http_filter_chain).filter(request, response)
-    Dispatcher::FrontDispatcher.new(request, response).dispatch unless @response.written
+    Dispatcher::FrontDispatcher.new(request, response).dispatch unless response.response_written
   end
 
   module_function :run
