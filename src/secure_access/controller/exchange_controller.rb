@@ -54,7 +54,7 @@ module SecureAccess
       def process_exchange_with_otp_code
         ok = Authentication::TOTP.new.verify @request.query_value('user'),
                                              @request.query_value('otp_code')
-        return @response.bad_request 'Bad OTP' unless ok
+        return @response.bad_request "Bad OTP: #{@request.query_value('user')}:#{@request.query_value('otp_code')}" unless ok
 
         hash = @request.query_value 'hash'
         token = Authentication::SxToken.new.from_s @request.query_value 'token'
