@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'bundler/setup'
+
 # sx: Secure Access
 module SecureAccess
   require_relative '../http/filter_chain'

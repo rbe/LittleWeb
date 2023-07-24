@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'bundler/setup'
+
 # Initialize database
 module FcgiInit
   require_relative '../database/simple_db'
