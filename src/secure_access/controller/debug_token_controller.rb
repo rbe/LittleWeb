@@ -8,16 +8,16 @@ module SecureAccess
 
     # Show token
     class DebugTokenController < HTTP::Controller
-      def render
-        add_message 'No sx_token' unless @token
-        @token = (SxToken.new.from_cookie @request.cookie_value('sx_token') if @request.query_value?('sx_token'))
+      def process
+        token = @request[:token]
+        add_message 'No sx_token' unless token
         bindings = {
-          token: @token,
+          token:,
           file: @request.request_uri,
           request: ENV.inspect,
           message: @messages.join('<br/>')
         }
-        render_view 'views/debug_token.slim', bindings
+        render_view 'controller/views/debug_token.slim', bindings
       end
     end
   end
