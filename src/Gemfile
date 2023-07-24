@@ -11,8 +11,8 @@ gem 'asciidoctor-plantuml'
 gem 'mail'
 gem 'rotp'
 gem 'rqrcode'
-gem 'rubocop', group: 'development'
+gem 'rubocop', group: 'development', require: false
 gem 'slim'
 gem 'sqlite3'
 gem 'tilt'
-gem 'webrick', group: 'development'
+gem 'webrick', group: 'development', require: false
