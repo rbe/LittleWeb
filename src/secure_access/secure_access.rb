@@ -20,7 +20,6 @@ module SecureAccess
     %r{^.*/registration.*$},
     %r{^.*/access_request.*$},
     %r{^.*/exchange.*$},
-    %r{^.*/debug_.+},
     %r{^.*/$}
   ].freeze
 
