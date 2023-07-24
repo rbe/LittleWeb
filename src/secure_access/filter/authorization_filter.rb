@@ -6,6 +6,8 @@ module SecureAccess
   module HttpFilter
     # Validate sx_token
     class AuthorizationFilter
+      require_relative 'constants'
+
       # @param [Array<Regex>] include_urls
       # @param [Array<Regex>] exclude_urls
       def initialize(include_urls = [], exclude_urls = [])
@@ -17,7 +19,7 @@ module SecureAccess
         if excluded?(request)
           # Ignored
         elsif included?(request)
-          if request.authenticated? && access?(request[:user], request.request_uri)
+          if request.authenticated? && access?(request[:token].user, request.request_uri)
             request.authorize
           else
             request.unauthorize
