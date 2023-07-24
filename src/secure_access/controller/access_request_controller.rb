@@ -25,10 +25,12 @@ module SecureAccess
       end
 
       def processable?
-        return true if @request.query_value? 'user'
-
-        @response.redirect '/Gallimaufry/'
-        false
+        true
+        # TODO ???
+        #return true if @request.query_value? 'user'
+        #
+        #@response.redirect '/Gallimaufry/'
+        #false
       end
 
       def process
@@ -67,7 +69,7 @@ module SecureAccess
       def create_sx_token
         user = validate_user
         url = validate_url
-        return if user.nil_or_empty? || token.nil_or_empty? || url.nil_or_empty?
+        return if user.nil_or_empty? || url.nil_or_empty?
 
         Authentication::SxToken.new.with user, url
       end
