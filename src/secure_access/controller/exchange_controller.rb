@@ -13,10 +13,17 @@ module SecureAccess
       require_relative '../../authentication/totp'
 
       def processable?
-        @response.bad_request 'No token' unless @request.query_value? 'token', 'hash'
+        unless @request.query_value? 'token', 'hash'
+          @response.bad_request 'No token'
+          return false
+        end
         token = Authentication::SxToken.new.from_s @request.query_value 'token'
         hash = @request.query_value 'hash'
-        @response.bad_request 'Invalid token' unless token === hash
+        unless token === hash
+          @response.bad_request 'Invalid token'
+          return false
+        end
+        true
       end
 
       def process
