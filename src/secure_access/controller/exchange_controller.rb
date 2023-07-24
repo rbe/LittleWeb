@@ -40,7 +40,7 @@ module SecureAccess
       private
 
       def render_otp_form
-        token = @request.query_value 'token'
+        token = Authentication::SxToken.new.from_s @request.query_value 'token'
         hash = @request.query_value 'hash'
         bindings = {
           '__csrf_token': HTTP::CsrfToken.new,
