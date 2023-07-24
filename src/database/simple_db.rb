@@ -78,6 +78,8 @@ module Database
              end
         db.results_as_hash = true
         db
+      rescue SQLite3::Exception => e
+        puts "Could not open database #{Database::DB_FILE}"
       end
     end
   end
