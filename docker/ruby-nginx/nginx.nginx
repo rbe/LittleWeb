@@ -82,7 +82,7 @@ http {
             #fastcgi_pass unix:/var/run/fcgiwrap.socket;
             fastcgi_pass ruby-fcgiwrap:9000;
             include /etc/nginx/fastcgi_params;
-            fastcgi_param DOCUMENT_ROOT /home/rbe/cgi-bin;
+            fastcgi_param DOCUMENT_ROOT /home/rbe/cgi-bin/src;
             fastcgi_param SCRIPT_NAME /secure_access/secure_access.rb;
             #fastcgi_param REQUEST_SCHEME https;
             #fastcgi_param HTTP_HOST bensmann.com;
