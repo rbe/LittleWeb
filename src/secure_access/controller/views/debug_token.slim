@@ -12,29 +12,29 @@ html
           td.a
           td.b Hello!
       tr
-        td Message
+        td.a Message
         td #{message}
       tr
-        td Token
+        td.a Token
         td #{token}
       tr
-        td Token Hash
+        td.a Token Hash
         td #{token&.hash}
       tr
-        td User
+        td.a User
         td #{token&.user}
       tr
-        td URL
+        td.a URL
         td #{token&.url}
       tr
-        td Expires
+        td.a Expires
         td #{token&.expires.to_i}/#{token&.expires}
       tr
-        td Now
+        td.a Now
         td #{Time.now.to_i}/#{Time.now}
       tr
-        td Token timed out?
+        td.a Token timed out?
         td #{token&.timed_out?}
       tr
-        td Token valid for file?
+        td.a Token valid for file?
         td #{token&.valid? file}
