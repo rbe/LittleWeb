@@ -11,6 +11,8 @@ module SecureAccess
     # E-Mail
     EMAIL_HOST_FQDN = ENV['GM_EMAIL_HOST_FQDN'] || 'mailhog'
     EMAIL_HOST_PORT = (ENV['GM_EMAIL_HOST_PORT'] || '1025').to_i
+    EMAIL_FROM_DOMAIN = ENV['GM_EMAIL_FROM_DOMAIN'] || 'example.com'
     EMAIL_FROM = ENV['GM_EMAIL_FROM'] || 'gallimaufry@example.com'
+    EMAIL_PASSWORD = ENV['GM_EMAIL_PASSWORD'] || 'pa55word'
   end
 end

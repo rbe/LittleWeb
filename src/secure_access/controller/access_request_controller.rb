@@ -19,7 +19,10 @@ module SecureAccess
         @mail = Mail.new do
           delivery_method :smtp,
                           address: Constants::EMAIL_HOST_FQDN,
-                          port: Constants::EMAIL_HOST_PORT
+                          port: Constants::EMAIL_HOST_PORT,
+                          domain: Constants::EMAIL_FROM_DOMAIN,
+                          user_name: Constants::EMAIL_FROM,
+                          password: Constants::EMAIL_PASSWORD
           from Constants::EMAIL_FROM
         end
       end
