@@ -9,6 +9,7 @@ gem 'asciidoctor-diagram'
 gem 'asciidoctor-kroki'
 gem 'asciidoctor-plantuml'
 gem 'mail'
+gem 'rake'
 gem 'rotp'
 gem 'rqrcode'
 gem 'rubocop', group: 'development', require: false
