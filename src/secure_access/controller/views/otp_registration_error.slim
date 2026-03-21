@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    title Gallimaufry OTP Registration
+    link rel="icon" type="image/x-icon" href="/assets/favicon.ico"
+    link rel="stylesheet" type="text/css" href="/assets/css/gallimaufry.css"
+  body
+    h1 Gallimaufry OTP Registration
+    table
+      thead
+        tr
+          td.a
+          td.b Error
+      tr
+        td.a
+          label for="user" User ID
+        td.b id="user" #{user}
+      tr
+        td.a OTP Registration
+        td.b
+          span Failed.
+          a href="/Gallimaufry/registration?user=#{user}" I'd like to try again.
+      tr
+        td.a
+        td.b #{{message}}

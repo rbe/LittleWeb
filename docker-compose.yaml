@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: "no"
+    networks:
+      - backend
+    ports:
+      - "8025:8025"
+  kroki:
+    image: yuzutech/kroki:latest
+    restart: "no"
+    networks:
+      - backend
+  #plantuml:
+  #  image: plantuml/plantuml-server:jetty
+  #  restart: "no"
+  #  networks:
+  #    - backend
+  #  #ports:
+  #  #  - "8001:8080"
+  ruby-fcgiwrap:
+    build:
+      context: docker/ruby-fcgiwrap
+    image: ruby-fcgiwrap:latest
+    restart: "no"
+    environment:
+      - TZ=Europe/Berlin
+      - GM_URL_PREFIX=/Gallimaufry
+      - GM_DB_FILE=/db/secure_access.db
+      - GM_BASE_DIR=/data
+      - GM_OTP_ISSUER=example.com
+      - GM_EMAIL_HOST_FQDN=mailhog
+      - GM_EMAIL_HOST_PORT=1025
+      - GM_EMAIL_FROM=gallimaufry@example.com
+    volumes:
+      - ./src:/home/rbe/cgi-bin:ro #,exec
+      - ./db:/db:rw
+      - ../:/data:rw
+    networks:
+      - backend
+  ruby-nginx:
+    build:
+      context: docker/ruby-nginx
+    image: ruby-nginx:latest
+    depends_on:
+      - ruby-fcgiwrap
+    restart: "no"
+    environment:
+      - TZ=Europe/Berlin
+    volumes:
+      - ../asciiblog/content/assets:/assets:ro
+    networks:
+      - backend
+    ports:
+      - "8080:8080"
+
+networks:
+  backend:

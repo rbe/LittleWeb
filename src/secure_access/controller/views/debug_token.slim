@@ -1,0 +1,40 @@
+doctype html
+html
+  head
+    title Gallimaufry: Debug Token
+    link rel="icon" type="image/x-icon" href="/assets/favicon.ico"
+    link rel="stylesheet" type="text/css" href="/assets/css/gallimaufry.css"
+  body
+    h1 Debug Token
+    table
+      thead
+        tr
+          td.a
+          td.b Hello!
+      tr
+        td.a Message
+        td #{message}
+      tr
+        td.a Token
+        td #{token}
+      tr
+        td.a Token Hash
+        td #{token&.hash}
+      tr
+        td.a User
+        td #{token&.user}
+      tr
+        td.a URL
+        td #{token&.url}
+      tr
+        td.a Expires
+        td #{token&.expires.to_i}/#{token&.expires}
+      tr
+        td.a Now
+        td #{Time.now.to_i}/#{Time.now}
+      tr
+        td.a Token timed out?
+        td #{token&.timed_out?}
+      tr
+        td.a Token valid for file?
+        td #{token&.valid? file}
